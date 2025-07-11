@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+*.log
+*.lock
+.env
+.env.*
+coverage/
+.nyc_output/
+*.config.js
