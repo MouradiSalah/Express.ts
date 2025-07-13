@@ -53,10 +53,7 @@ export class BodyParser {
     const result: Record<string, string> = {};
 
     for (const [key, value] of params.entries()) {
-      // Only include entries that have actual values
-      if (value !== '') {
-        result[key] = value;
-      }
+      result[key] = decodeURIComponent(value);
     }
 
     return result;

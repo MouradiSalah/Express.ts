@@ -116,6 +116,7 @@ describe('BodyParser', () => {
 
       expect(result.form).toEqual({
         name: 'John',
+        invalid: '',
         email: 'test',
       });
       expect(result.raw).toBe(malformedData);

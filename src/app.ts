@@ -147,7 +147,8 @@ export class App {
   use(pathOrHandler: string | RequestHandler, handler?: RequestHandler): void {
     if (typeof pathOrHandler === 'string' && handler) {
       this.middlewares.push((req, res, next) => {
-        if (req.url?.startsWith(pathOrHandler)) {
+        const pathname = parse(req.url ?? '').pathname ?? '';
+        if (pathname === pathOrHandler) {
           handler(req, res, next);
         } else {
           next();
