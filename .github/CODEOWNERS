@@ -1,0 +1,24 @@
+# Global code owners
+
+- @MouradiSalah
+
+# Core application files
+
+/src/ @MouradiSalah
+
+# Build and configuration files
+
+_.json @MouradiSalah
+_.yml @MouradiSalah
+\*.yaml @MouradiSalah
+/scripts/ @MouradiSalah
+
+# Documentation
+
+/docs/ @MouradiSalah
+README.md @MouradiSalah
+CONTRIBUTING.md @MouradiSalah
+
+# GitHub workflows
+
+/.github/ @MouradiSalah
