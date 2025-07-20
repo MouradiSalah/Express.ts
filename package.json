@@ -1,7 +1,7 @@
 {
   "name": "express.ts",
   "version": "1.0.0",
-  "description": "A TypeScript-first Express-like HTTP server framework with modern features (build requires Linux/Unix)",
+  "description": "A TypeScript-first Express-like HTTP server framework with modern features",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -43,7 +43,7 @@
     "format": "prettier --write 'src/**/*.{ts,js,json}' 'tests/**/*.{ts,js,json}' '*.{js,json,md}'",
     "format:check": "prettier --check 'src/**/*.{ts,js,json}' 'tests/**/*.{ts,js,json}' '*.{js,json,md}'",
     "check": "npm run lint && npm run format:check && npm run test",
-    "dev:example": "nodemon --watch 'examples/**/*.ts' --exec 'node --import tsx examples/server.ts'",
+    "dev:example": "nodemon --watch 'examples/**/*.ts' --exec 'node --import tsx examples/basic-usage.ts'",
     "start:example": "node --import tsx examples/server.ts",
     "validate": "bash scripts/validate-workflow.sh",
     "prepare": "husky"
