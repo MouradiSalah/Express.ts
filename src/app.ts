@@ -79,10 +79,7 @@ export class App {
         return;
       }
 
-      const route = this.findMatchingRoute(
-        req.method as HttpMethod,
-        req.url ?? ''
-      );
+      const route = this.findMatchingRoute(req.method, req.url ?? '');
 
       if (route) {
         await this.enhanceRequest(req, route);

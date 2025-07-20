@@ -5,7 +5,7 @@ export interface Request extends IncomingMessage {
   query?: Record<string, string>;
   body?: unknown;
   url: string;
-  method: string;
+  method: HttpMethod;
 }
 
 export interface Response extends ServerResponse {
