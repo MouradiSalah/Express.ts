@@ -2,6 +2,29 @@ import { RouteParser } from '../../src/utils/route-parser';
 
 describe('RouteParser', () => {
   describe('parseRoute', () => {
+    it('should match routes with single colon parameter', () => {
+      const result = RouteParser.parseRoute('/users/:id', '/users/123');
+      expect(result.isMatch).toBe(true);
+      expect(result.params).toEqual({ id: '123' });
+    });
+
+    it('should match routes with multiple colon parameters', () => {
+      const result = RouteParser.parseRoute(
+        '/users/:id/:name',
+        '/users/123/john'
+      );
+      expect(result.isMatch).toBe(true);
+      expect(result.params).toEqual({ id: '123', name: 'john' });
+    });
+
+    it('should match routes with mixed parameter styles', () => {
+      const result = RouteParser.parseRoute(
+        '/users/{id}/:name',
+        '/users/123/john'
+      );
+      expect(result.isMatch).toBe(true);
+      expect(result.params).toEqual({ id: '123', name: 'john' });
+    });
     it('should match exact routes without parameters', () => {
       const result = RouteParser.parseRoute('/users', '/users');
       expect(result.isMatch).toBe(true);

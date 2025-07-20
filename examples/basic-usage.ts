@@ -29,6 +29,15 @@ app.get('/api/users/{id}', (req, res) => {
   });
 });
 
+app.get('/api/users/:id/{name}', (req, res) => {
+  res.json({
+    user: {
+      id: req.params?.id,
+      name: req.params?.name,
+    },
+  });
+});
+
 // POST route with body parsing
 app.post('/api/users', (req, res) => {
   const userData = req.body;

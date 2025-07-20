@@ -9,7 +9,7 @@ A TypeScript-first, Express-like HTTP server framework with modern features and 
 ## Features
 
 - 🚀 **TypeScript-first** with strict type safety
-- 🛣️ **Dynamic route parameters** with `{param}` syntax
+- 🛣️ **Dynamic route parameters** with `{param}` and `:param` syntax
 - 📦 **Built-in body parsing** (JSON, form-encoded, raw)
 - 🔧 **Middleware support** with error handling
 - 🧪 **Comprehensive test suite** (57 tests, 100% coverage)
@@ -58,9 +58,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes with parameters
+// Routes with parameters (supports both {param} and :param)
 app.get('/users/{id}', (req, res) => {
   res.json({ userId: req.params?.id });
+});
+
+app.get('/users/:id/:name', (req, res) => {
+  res.json({
+    id: req.params?.id,
+    name: req.params?.name,
+  });
 });
 
 // POST with body parsing
@@ -91,10 +98,17 @@ app.listen(3000, () => {
 
 ### Route Parameters
 
-Use `{param}` syntax for dynamic routes:
+You can use either `{param}` or `:param` syntax for dynamic routes:
 
 ```typescript
+// Both of these are valid and equivalent:
 app.get('/users/{id}/posts/{postId}', (req, res) => {
+  const id = req.params?.id;
+  const postId = req.params?.postId;
+  // Handle request
+});
+
+app.get('/users/:id/posts/:postId', (req, res) => {
   const id = req.params?.id;
   const postId = req.params?.postId;
   // Handle request

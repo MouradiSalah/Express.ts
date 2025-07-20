@@ -17,9 +17,8 @@ export class RouteParser {
     for (let i = 0; i < routeSegments.length; i++) {
       const routeSegment = routeSegments[i];
       const pathSegment = pathSegments[i];
-
-      if (this.isParameterSegment(routeSegment)) {
-        const paramName = this.extractParameterName(routeSegment);
+      const paramName = this.getParameterName(routeSegment);
+      if (paramName) {
         params[paramName] = pathSegment;
       } else if (routeSegment !== pathSegment) {
         return { isMatch: false, params: {} };
@@ -29,12 +28,14 @@ export class RouteParser {
     return { isMatch: true, params };
   }
 
-  private static isParameterSegment(segment: string): boolean {
-    return segment.startsWith('{') && segment.endsWith('}');
-  }
-
-  private static extractParameterName(segment: string): string {
-    return segment.slice(1, -1);
+  private static getParameterName(segment: string): string | null {
+    if (segment.startsWith('{') && segment.endsWith('}')) {
+      return segment.slice(1, -1).trim();
+    }
+    if (segment.startsWith(':')) {
+      return segment.slice(1).trim();
+    }
+    return null;
   }
 
   static buildRoutePattern(path: string): string {
