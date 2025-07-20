@@ -95,7 +95,8 @@ Use `{param}` syntax for dynamic routes:
 
 ```typescript
 app.get('/users/{id}/posts/{postId}', (req, res) => {
-  const { id, postId } = req.params;
+  const id = req.params?.id;
+  const postId = req.params?.postId;
   // Handle request
 });
 ```
