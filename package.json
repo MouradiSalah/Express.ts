@@ -1,5 +1,5 @@
 {
-  "name": "express.ts",
+  "name": "@mouradisalah/express.ts",
   "version": "1.0.0",
   "description": "A TypeScript-first Express-like HTTP server framework with modern features",
   "type": "module",
