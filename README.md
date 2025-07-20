@@ -24,31 +24,43 @@ A TypeScript-first, Express-like HTTP server framework with modern features and 
 
 ## Quick Start
 
+## Installation
+
+Install from npm (recommended):
+
+```bash
+npm install @mouradisalah/express.ts
+```
+
+Or install from GitHub Packages (requires authentication):
+
+```bash
+npm install @mouradisalah/express.ts --registry=https://npm.pkg.github.com
+```
+
+---
+
+## Quick Start (Local Development)
+
 ```bash
 # Clone the repository
 git clone https://github.com/MouradiSalah/express.ts.git
 cd express.ts
-
-# Install dependencies
 npm install
-
-# Check build environment (Linux/Unix required)
 npm run build:check
-
-# Build the package
 npm run build
-
-# Start development server
 npm run dev
-
-# Run tests
 npm test
 ```
 
 ## Usage
 
 ```typescript
-import { createApplication } from './express';
+// Import for npm usage:
+import { createApplication } from '@mouradisalah/express.ts';
+
+// Import for local development (if cloned):
+// import { createApplication } from './express';
 
 const app = createApplication();
 
