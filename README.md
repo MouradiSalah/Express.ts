@@ -2,7 +2,7 @@
 
 A TypeScript-first, Express-like HTTP server framework with modern features and comprehensive testing.
 
-[![CI/CD Pipeline](https://github.com/yourusername/express.ts/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/express.ts/actions/workflows/ci.yml)
+[![CI/CD Pipeline](https://github.com/MouradiSalah/express.ts/actions/workflows/ci.yml/badge.svg)](https://github.com/MouradiSalah/express.ts/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
@@ -26,7 +26,7 @@ A TypeScript-first, Express-like HTTP server framework with modern features and 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/express.ts.git
+git clone https://github.com/MouradiSalah/express.ts.git
 cd express.ts
 
 # Install dependencies
