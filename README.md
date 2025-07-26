@@ -19,6 +19,8 @@ A TypeScript-first, Express-like HTTP server framework with modern features and 
 ## Requirements
 
 - **Node.js** 18.0.0 or higher
+- **`"type": "module"`** in your package.json (ES modules required)
+- **tsx** recommended for TypeScript execution
 - **Linux/Unix environment** for building from source (uses bash scripts and sed commands)
 - **TypeScript** 5.8+ (for development)
 
@@ -30,6 +32,26 @@ Install from npm (recommended):
 
 ```bash
 npm install @mouradisalah/express.ts
+npm install --save-dev tsx @types/node typescript
+```
+
+Example package.json setup:
+
+```json
+{
+  "type": "module",
+  "scripts": {
+    "start": "tsx server.ts"
+  },
+  "dependencies": {
+    "@mouradisalah/express.ts": "^1.0.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.3",
+    "@types/node": "^24.1.0",
+    "typescript": "^5.8.3"
+  }
+}
 ```
 
 Or install from GitHub Packages (requires authentication):
