@@ -7,6 +7,9 @@ export { createApplication } from './express';
 // Main application class
 export { App } from './app';
 
+// Router functionality
+export { Router, createRouter } from './router';
+
 // Type definitions
 export type {
   Application,

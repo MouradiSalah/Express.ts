@@ -11,8 +11,9 @@ A TypeScript-first, Express-like HTTP server framework with modern features and 
 - 🚀 **TypeScript-first** with strict type safety
 - 🛣️ **Dynamic route parameters** with `{param}` and `:param` syntax
 - 📦 **Built-in body parsing** (JSON, form-encoded, raw)
-- 🔧 **Middleware support** with error handling
-- 🧪 **Comprehensive test suite** (57 tests, 100% coverage)
+- 🔧 **Middleware support** with error handling and prefix matching
+- 🏭 **Router support** for modular route organization (Express.js style)
+- 🧪 **Comprehensive test suite** (57+ tests, 100% coverage)
 - ⚡ **Express-like API** for familiar development experience
 - 🏗️ **Modular architecture** with clean separation of concerns
 
@@ -79,10 +80,10 @@ npm test
 
 ```typescript
 // Import for npm usage:
-import { createApplication } from '@mouradisalah/express.ts';
+import { createApplication, createRouter } from '@mouradisalah/express.ts';
 
 // Import for local development (if cloned):
-// import { createApplication } from './express';
+// import { createApplication, createRouter } from './express';
 
 const app = createApplication();
 
@@ -103,6 +104,20 @@ app.get('/users/:id/:name', (req, res) => {
     name: req.params?.name,
   });
 });
+
+// Router for modular organization (Express.js style)
+const apiRouter = createRouter();
+
+apiRouter.use((req, res, next) => {
+  res.setHeader('X-API-Version', '1.0');
+  next();
+});
+
+apiRouter.get('/status', (req, res) => {
+  res.json({ status: 'active' });
+});
+
+app.use('/api', apiRouter);
 
 // POST with body parsing
 app.post('/users', (req, res) => {
@@ -169,6 +184,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Prefix-based middleware (Express.js style)
+app.use('/api', (req, res, next) => {
+  res.setHeader('X-API-Version', '1.0');
+  next();
+});
+
 // Error handling middleware
 app.use((req, res, next) => {
   try {
@@ -177,6 +198,37 @@ app.use((req, res, next) => {
     res.status(500).json({ error: error.message });
   }
 });
+```
+
+### Router Support
+
+Express.js-style router for modular route organization:
+
+```typescript
+// userController.ts
+import { createRouter } from '@mouradisalah/express.ts';
+
+const userRouter = createRouter();
+
+userRouter.use((req, res, next) => {
+  console.log('User route accessed');
+  next();
+});
+
+userRouter.get('/', (req, res) => {
+  res.json({ users: [] });
+});
+
+userRouter.get('/{id}', (req, res) => {
+  res.json({ user: { id: req.params?.id } });
+});
+
+export default userRouter;
+
+// app.ts
+import userRouter from './userController';
+
+app.use('/api/users', userRouter);
 ```
 
 ## Development

@@ -335,4 +335,186 @@ describe('App', () => {
         .expect('Hello Text');
     });
   });
+
+  describe('Middleware', () => {
+    it('should execute global middleware', async () => {
+      const middleware = jest.fn((req, res, next) => {
+        res.setHeader('X-Middleware', 'executed');
+        next();
+      });
+
+      app.use(middleware);
+      app.get('/test', (req, res) => {
+        res.json({ success: true });
+      });
+
+      const server = createServer((req, res) => {
+        app.toApplication()(req, res);
+      });
+
+      await request(server)
+        .get('/test')
+        .expect(200)
+        .expect('X-Middleware', 'executed')
+        .expect({ success: true });
+
+      expect(middleware).toHaveBeenCalledTimes(1);
+    });
+
+    it('should support prefix-based middleware (Express.js style)', async () => {
+      const apiMiddleware = jest.fn((req, res, next) => {
+        res.setHeader('X-API-Version', '1.0');
+        next();
+      });
+
+      app.use('/api', apiMiddleware);
+      app.get('/api/users', (req, res) => {
+        res.json({ users: [] });
+      });
+      app.get('/api/posts', (req, res) => {
+        res.json({ posts: [] });
+      });
+      app.get('/other', (req, res) => {
+        res.json({ other: true });
+      });
+
+      const server = createServer((req, res) => {
+        app.toApplication()(req, res);
+      });
+
+      // Should execute middleware for /api/users
+      await request(server)
+        .get('/api/users')
+        .expect(200)
+        .expect('X-API-Version', '1.0')
+        .expect({ users: [] });
+
+      // Should execute middleware for /api/posts
+      await request(server)
+        .get('/api/posts')
+        .expect(200)
+        .expect('X-API-Version', '1.0')
+        .expect({ posts: [] });
+
+      // Should NOT execute middleware for /other
+      await request(server)
+        .get('/other')
+        .expect(200)
+        .expect((res) => {
+          expect(res.headers['x-api-version']).toBeUndefined();
+        })
+        .expect({ other: true });
+
+      expect(apiMiddleware).toHaveBeenCalledTimes(2);
+    });
+
+    it('should support exact path middleware', async () => {
+      const exactMiddleware = jest.fn((req, res, next) => {
+        res.setHeader('X-Exact', 'true');
+        next();
+      });
+
+      app.use('/api/users', exactMiddleware);
+      app.get('/api/users', (req, res) => {
+        res.json({ users: [] });
+      });
+      app.get('/api/users/123', (req, res) => {
+        res.json({ user: { id: '123' } });
+      });
+
+      const server = createServer((req, res) => {
+        app.toApplication()(req, res);
+      });
+
+      // Should execute middleware for exact match
+      await request(server)
+        .get('/api/users')
+        .expect(200)
+        .expect('X-Exact', 'true');
+
+      // Should also execute middleware for sub-paths
+      await request(server)
+        .get('/api/users/123')
+        .expect(200)
+        .expect('X-Exact', 'true');
+
+      expect(exactMiddleware).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle multiple middleware in order', async () => {
+      const order: string[] = [];
+
+      app.use((req, res, next) => {
+        order.push('global');
+        next();
+      });
+
+      app.use('/api', (req, res, next) => {
+        order.push('api');
+        next();
+      });
+
+      app.get('/api/test', (req, res) => {
+        order.push('handler');
+        res.json({ order });
+      });
+
+      const server = createServer((req, res) => {
+        app.toApplication()(req, res);
+      });
+
+      await request(server)
+        .get('/api/test')
+        .expect(200)
+        .expect({ order: ['global', 'api', 'handler'] });
+    });
+
+    it('should not execute middleware for non-matching paths', async () => {
+      const adminMiddleware = jest.fn((req, res, next) => {
+        next();
+      });
+
+      app.use('/admin', adminMiddleware);
+      app.get('/public', (req, res) => {
+        res.json({ public: true });
+      });
+
+      const server = createServer((req, res) => {
+        app.toApplication()(req, res);
+      });
+
+      await request(server).get('/public').expect(200).expect({ public: true });
+
+      expect(adminMiddleware).not.toHaveBeenCalled();
+    });
+
+    it('should handle root path middleware correctly', async () => {
+      const rootMiddleware = jest.fn((req, res, next) => {
+        res.setHeader('X-Root', 'true');
+        next();
+      });
+
+      app.use('/', rootMiddleware);
+      app.get('/test', (req, res) => {
+        res.json({ test: true });
+      });
+      app.get('/api/users', (req, res) => {
+        res.json({ users: [] });
+      });
+
+      const server = createServer((req, res) => {
+        app.toApplication()(req, res);
+      });
+
+      // Should execute for all paths (prefix matching)
+      await request(server).get('/test').expect(200).expect('X-Root', 'true');
+
+      await request(server)
+        .get('/api/users')
+        .expect(200)
+        .expect('X-Root', 'true');
+
+      expect(rootMiddleware).toHaveBeenCalledTimes(2);
+    });
+  });
 });
