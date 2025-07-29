@@ -10,6 +10,7 @@ import {
   Route,
 } from './types';
 import { BodyParser, RouteParser } from './utils';
+import { Router } from './router';
 
 export class App {
   private routes: Route[] = [];
@@ -141,19 +142,92 @@ export class App {
     return this;
   }
 
-  use(pathOrHandler: string | RequestHandler, handler?: RequestHandler): void {
-    if (typeof pathOrHandler === 'string' && handler) {
+  use(
+    pathOrHandler: string | RequestHandler | Router,
+    handler?: RequestHandler | Router
+  ): void {
+    if (typeof pathOrHandler === 'string' && handler instanceof Router) {
+      // Mount router at specific path: app.use('/api', router)
+      this.mountRouter(pathOrHandler, handler);
+    } else if (
+      typeof pathOrHandler === 'string' &&
+      typeof handler === 'function'
+    ) {
+      // Mount middleware at specific path: app.use('/api', middleware)
       this.middlewares.push((req, res, next) => {
         const pathname = parse(req.url ?? '').pathname ?? '';
-        if (pathname === pathOrHandler) {
+        const normalizedPath = RouteParser.normalizeRoute(pathOrHandler);
+
+        // Special case for root path - should match all routes
+        if (normalizedPath === '/') {
+          handler(req, res, next);
+          return;
+        }
+
+        // Support prefix matching like Express.js
+        if (
+          pathname.startsWith(normalizedPath) &&
+          (pathname === normalizedPath ||
+            pathname[normalizedPath.length] === '/')
+        ) {
           handler(req, res, next);
         } else {
           next();
         }
       });
+    } else if (pathOrHandler instanceof Router) {
+      // Mount router at root: app.use(router)
+      this.mountRouter('/', pathOrHandler);
     } else if (typeof pathOrHandler === 'function') {
+      // Global middleware: app.use(middleware)
       this.middlewares.push(pathOrHandler);
+    } else if (typeof pathOrHandler === 'string' && !handler) {
+      // Handle case where only path is provided without handler - should throw error
+      throw new Error('Handler is required when path is provided');
     }
+  }
+
+  private mountRouter(basePath: string, router: Router): void {
+    const normalizedBasePath = RouteParser.normalizeRoute(basePath);
+
+    // Add router's middleware
+    router.getMiddlewares().forEach((middleware) => {
+      this.middlewares.push((req, res, next) => {
+        const pathname = parse(req.url ?? '').pathname ?? '';
+
+        if (
+          normalizedBasePath === '/' ||
+          (pathname.startsWith(normalizedBasePath) &&
+            (pathname === normalizedBasePath ||
+              pathname[normalizedBasePath.length] === '/'))
+        ) {
+          // Modify req.url to remove the base path for the router
+          const originalUrl = req.url;
+          if (normalizedBasePath !== '/') {
+            req.url = pathname.substring(normalizedBasePath.length) || '/';
+            if (req.url && !req.url.startsWith('/')) {
+              req.url = '/' + req.url;
+            }
+          }
+
+          middleware(req, res, (error?: Error) => {
+            req.url = originalUrl; // Restore original URL
+            next(error);
+          });
+        } else {
+          next();
+        }
+      });
+    });
+
+    // Add router's routes
+    router.getRoutes().forEach((route) => {
+      const fullPath =
+        normalizedBasePath === '/'
+          ? route.path
+          : normalizedBasePath + route.path;
+      this.addRoute(route.method as HttpMethod, fullPath, route.handler);
+    });
   }
 
   listen(port: number, callback?: () => void): void {

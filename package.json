@@ -1,6 +1,6 @@
 {
   "name": "@mouradisalah/express.ts",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "A TypeScript-first Express-like HTTP server framework with modern features",
   "type": "module",
   "main": "dist/index.js",
